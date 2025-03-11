@@ -8,7 +8,8 @@ import (
 )
 
 func SetupRouter() *mux.Router {
-	r := mux.NewRouter()
+	// r := mux.NewRouter()
+	r := mux.NewRouter().StrictSlash(true) // Add StrictSlash
 	r.HandleFunc("/signup", handlers.Signup).Methods("POST")
 	r.HandleFunc("/login", handlers.Login).Methods("POST")
 	// r.HandleFunc("/login", handlers.Login).Methods("POST")

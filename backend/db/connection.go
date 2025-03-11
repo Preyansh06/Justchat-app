@@ -13,7 +13,7 @@ var DB *sql.DB
 
 func InitDB() {
 	var err error
-	dsn := "user=preyansh password=root dbname=justchatapp sslmode=disable"
+	dsn := "user=postgres password=root dbname=justchatapp sslmode=disable"
 	DB, err = sql.Open("postgres", dsn)
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
