@@ -13,6 +13,8 @@ import (
 func main() {
 	db.InitDB() // Initialize database
 	r := routes.SetupRouter()
+	// Apply JWT Middleware to all routes
+	// r.Use(middleware.JWTAuthMiddleware)
 	// Print all registered routes
 	r.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
 		path, err := route.GetPathTemplate()
