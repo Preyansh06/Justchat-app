@@ -15,6 +15,7 @@ func SetupRouter() *mux.Router {
 	r.HandleFunc("/login", handlers.Login).Methods("POST")
 	// r.HandleFunc("/login", handlers.Login).Methods("POST")
 
+	r.HandleFunc("/ws", handlers.HandleWebSocket)
 	// Protected route (requires JWT)
 	protected := r.PathPrefix("/api").Subrouter()
 	protected.Use(middleware.JWTAuthMiddleware)
