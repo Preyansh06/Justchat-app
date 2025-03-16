@@ -19,5 +19,7 @@ func SetupRouter() *mux.Router {
 	protected := r.PathPrefix("/api").Subrouter()
 	protected.Use(middleware.JWTAuthMiddleware)
 	protected.HandleFunc("/profile", handlers.Profile).Methods("GET")
+	protected.HandleFunc("/chat", handlers.CreateChatHandler).Methods("POST")
+	protected.HandleFunc("/chat/{id}/message", handlers.SendMessageHandler).Methods("POST")
 	return r
 }
