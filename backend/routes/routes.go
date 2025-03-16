@@ -21,5 +21,6 @@ func SetupRouter() *mux.Router {
 	protected.HandleFunc("/profile", handlers.Profile).Methods("GET")
 	protected.HandleFunc("/chat", handlers.CreateChatHandler).Methods("POST")
 	protected.HandleFunc("/chat/{id}/message", handlers.SendMessageHandler).Methods("POST")
+	protected.HandleFunc("/chat/{id}/messages", handlers.GetMessagesHandler).Methods("GET")
 	return r
 }

@@ -37,3 +37,21 @@ func SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Message sent successfully"})
 }
+
+// GetMessagesHandler fetches chat history
+func GetMessagesHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	chatID, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		http.Error(w, "Invalid chat ID", http.StatusBadRequest)
+		return
+	}
+
+	messages, err := models.GetMessages(chatID)
+	if err != nil {
+		http.Error(w, "Could not fetch messages", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(messages)
+}
