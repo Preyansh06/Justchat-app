@@ -3,6 +3,7 @@ package main
 
 import (
 	"backend/db"
+	"backend/handlers"
 	"backend/routes"
 	"log"
 	"net/http"
@@ -23,6 +24,8 @@ func main() {
 		}
 		return nil
 	})
+	// Start WebSocket broadcast system
+	go handlers.StartBroadcast()
 
 	log.Println("Server running on port 8080")
 	http.ListenAndServe(":8080", r)
