@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"sync"
 
+	"backend/models"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -16,15 +18,8 @@ var upgrader = websocket.Upgrader{
 
 // Connection manager
 var clients = make(map[*websocket.Conn]bool) // Store connected clients
-var broadcast = make(chan Message)           // Channel for broadcasting messages
+var broadcast = make(chan models.Message)    // Channel for broadcasting messages
 var mutex = sync.Mutex{}                     // To prevent race conditions
-
-// Message struct for chat messages
-type Message struct {
-	ChatID   int    `json:"chat_id"`
-	SenderID int    `json:"sender_id"`
-	Content  string `json:"content"`
-}
 
 // HandleWebSocket manages WebSocket connections
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +29,13 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		log.Println("WebSocket upgrade error:", err)
 		return
 	}
-	defer conn.Close()
+	defer func() {
+		mutex.Lock()
+		delete(clients, conn)
+		mutex.Unlock()
+		conn.Close()
+		log.Println("Client disconnected")
+	}()
 
 	// Register the client
 	mutex.Lock()
@@ -44,18 +45,31 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	// Listen for messages
 	for {
-		var msg Message
+		var msg models.Message
 		err := conn.ReadJSON(&msg)
 		if err != nil {
-			log.Println("Read error:", err)
-			mutex.Lock()
-			delete(clients, conn) // Remove disconnected client
-			mutex.Unlock()
-			break
+			log.Println("Invalid WebSocket message received:", err)
+			continue // Keep listening instead of closing the connection
 		}
+		// if err != nil {
+		// 	log.Println("Read error:", err)
+		// 	mutex.Lock()
+		// 	delete(clients, conn) // Remove disconnected client
+		// 	mutex.Unlock()
+		// 	break
+		// }
 
 		log.Println("Received message:", msg)
-		broadcast <- msg // Send message to broadcast channel
+
+		// Store message in database
+		err = models.SendMessage(msg.ChatID, msg.SenderID, msg.Content)
+		if err != nil {
+			log.Println("Database error:", err)
+			continue
+		}
+
+		// Broadcast message to all clients
+		broadcast <- msg
 	}
 }
 
