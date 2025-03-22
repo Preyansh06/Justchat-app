@@ -10,3 +10,7 @@ Real time chat application made using Golang
 
 # Work on progress for -
 ✔ User Online status
+
+# Future scope of implementation - 
+✔ Typing Indicator
+✔ Read Receipts
